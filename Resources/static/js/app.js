@@ -93,16 +93,79 @@ function buildBarChart(sample) {
         let labels = otu_labels.slice(0,10).reverse();
 
         //set up trace for bar chart
-        let trace = {
+        let traceOne = {
             x: xticks,
             y: yticks,
             text: labels,
             type: "bar",
             orientation: "h"
         };
-            )
-    })
-}
 
+        //set up layout
+        let layout = {
+            title: "Top 10 OTUs Present"
+        };
 
+        //add Ploty to create bar chart
+        Plotly.newPlot("bar",[traceOne], layout)
+    });
+};
 
+//function for bubble chart
+function buildBubbleChart(sample) {
+    d3.json(url).then((data) => {
+        let sampleInfo = data.samples;
+
+        //filter the value of the sample
+        let value = sampleInfo.filter(result => result.id == sample);
+
+        //get first index from array
+        let valueData = value[0];
+
+        //Get otu_ids, labels, and sample values
+        let otu_ids = valueData.otu_ids;
+        let otu_labels = valueData.otu_lables;
+        let sample_values = valueData.sample_values;
+
+        //log data to console
+        console.log(otu_ids, otu_labels, sample_values);
+
+        //set trace for bubble chart
+        let traceTwo = {
+            x: otu_ids,
+            y: sample_values,
+            text: otu_labels,
+            mode: "markers",
+            marker: {
+                size: sample_values,
+                color: otu_ids,
+                colorscale: "Earth"
+            }
+        };
+        //create bubble chart layout
+        let layout = {
+            title: "Bacteria Per Sample",
+            hovermode: "closest",
+            xaxis: {title: "OTU ID"},
+        };
+
+        //add Ploty to create bar chart
+        Plotly.newPlot("bubble",[traceTwo], layout)
+    });
+
+};
+//Function to Update dashboard when sample changes
+function optionChanges(value) {
+    
+    //log new values
+    console.log(value);
+
+    //create functions
+    buildMetadata(value);
+    buildBarChart(value);
+    buildBubbleChart(value);
+    buildGauge(value);
+};
+
+//call dashboard function
+SUDB();
